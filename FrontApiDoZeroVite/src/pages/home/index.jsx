@@ -37,7 +37,7 @@ function Home() {
           <button>
             <img src={Trash} />
           </button>
-        </div>;
+        </div>
       })}
     </div>
   );
