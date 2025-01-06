@@ -1,30 +1,46 @@
+import { useEffect, useState, useRef } from "react";
 import "./style.css";
 import Trash from "../../assets/trash.svg";
+import api from "../../services/api"
 
 function Home() {
-  const users = [
-    {
-      id: "jfuhgfrfnie",
-      name: "Hiago",
-      age: 33,
-      email: "hiago@gmail.com",
-    },
-    {
-      id: "jfuhgfrfnieertr",
-      name: "Luana",
-      age: 345,
-      email: "linda@gmail.com",
-    },
-  ];
+  const [users, setUsers] = useState([])
+
+  const inputName = useRef()
+  const inputAge = useRef()
+  const inputEmail = useRef()
+
+  async function getUsers() {
+    const usersFromApi = await api.get('/usuarios')
+    setUsers(usersFromApi.data)
+  }
+
+  async function creatUsers() {
+    await api.post('/usuarios', {
+      name: inputName.current.value,
+      age: inputAge.current.value,
+      email: inputEmail.current.value
+    })
+    getUsers()
+  }
+
+  async function deleteUsers(id) {
+    await api.delete(`/usuarios/${id}`)
+    getUsers()
+  }
+
+  useEffect(() => {
+    getUsers()
+  }, [])
 
   return (
     <div className="container">
       <form action="">
         <h1>Cadastro de Usuários</h1>
-        <input type="text" name="nome" placeholder="Nome" />
-        <input type="number" name="idade" placeholder="Idade" />
-        <input type="email" name="email" placeholder="Email" />
-        <button type="button">Cadastrar</button>
+        <input type="text" name="nome" placeholder="Nome" ref={inputName}/>
+        <input type="text" name="idade" placeholder="Idade" ref={inputAge}/>
+        <input type="email" name="email" placeholder="Email" ref={inputEmail}/>
+        <button type="button" onClick={creatUsers}>Cadastrar</button>
       </form>
 
       {users.map((user) => {
@@ -34,7 +50,7 @@ function Home() {
             <p>Idade: <span>{user.age}</span></p>
             <p>Email: <span>{user.email}</span></p>
           </div>
-          <button>
+          <button onClick={() => deleteUsers(user.id)}>
             <img src={Trash} />
           </button>
         </div>
